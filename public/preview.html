@@ -83,41 +83,31 @@
     }
 
     .phoneWrap {
-      width: 340px;
-      height: 700px;
-      max-width: 92vw;
-      max-height: 86vh;
-      aspect-ratio: 9 / 19.5;
+      width: min(340px, 92vw, calc(90vh * 427 / 881));
+      aspect-ratio: 427 / 881;
       position: relative;
     }
 
     /*
-        Safari iOS fallback: an HTML div overlaid on the SVG,
-        positioned to match the foreignObject screen window
-        (x=18, y=18, w=390, h=844 inside the 427x881 viewBox).
-        Percentages: left=18/427=4.216%, top=18/881=2.043%,
-        width=390/427=91.335%, height=844/881=95.801%.
+        Screen glass inside the 427x881 frame:
+        x=18, y=18, w=390, h=844.
+        Top padding clears the clock and island.
+        Corner radii match the glass (55px): 14.1% of width, 6.52% of height.
       */
     .safariScreen {
-      display: none;
+      display: flex;
+      flex-direction: column;
       position: absolute;
-      left: 4.216%;
-      top: 2.043%;
-      width: 91.335%;
-      height: 95.801%;
+      left: 4.2155%;
+      top: 2.0431%;
+      width: 91.3349%;
+      height: 95.8002%;
       z-index: 2;
       overflow: hidden;
-      padding: var(--ss-pad-top, 0px) 0 var(--ss-pad-bottom, 0px) 0;
-      border-radius: var(--ss-radius, 14.1%);
-      background: var(--screenBg);
-    }
-
-    html.ios .safariScreen {
-      display: block;
-    }
-
-    html.ios .foScreen {
-      display: none;
+      padding: 7.35% 0 0;
+      background: #000;
+      border-radius: 14.1% / 6.52%;
+      clip-path: inset(0 round 14.1% / 6.52%);
     }
 
     .phoneSvg {
@@ -129,13 +119,7 @@
 
     /* Applied inside the SVG foreignObject (HTML subtree). */
     .foScreen {
-      width: 100%;
-      height: 100%;
-      padding-top: 0;
-      padding-bottom: 0;
-      overflow: hidden;
-      border-radius: 55.75px;
-      background: var(--screenBg);
+      display: none;
     }
 
     .overlaySvg {
@@ -149,12 +133,19 @@
 
     iframe {
       width: 100%;
-      height: 100%;
       border: 0;
       display: block;
       background: #fff;
       scrollbar-width: none;
       -ms-overflow-style: none;
+    }
+
+    .safariScreen iframe {
+      flex: 1 1 0;
+      width: 100%;
+      height: 0;
+      min-height: 0;
+      border-radius: 0;
     }
   </style>
 </head>
@@ -318,32 +309,7 @@
       const overrideUrl = params.get("url");
       const finalUrl = safeParseUrl(overrideUrl) || defaultAppUrl();
 
-      // Set src only on the iframe that will actually be visible.
-      if (isIOS) {
-        document.getElementById("previewFrameSafari").src = finalUrl;
-      } else {
-        document.getElementById("previewFrame").src = finalUrl;
-      }
-
-      // Keep the Safari fallback screen geometry proportional on resize.
-      // foreignObject screen: x=18,y=18,w=390,h=844 => pad-top=62/844, pad-bottom=34/844, radius=55/390
-      var safariEl = document.querySelector(".safariScreen");
-      function updateSafariMetrics() {
-        if (!safariEl) return;
-        var r = safariEl.getBoundingClientRect();
-        var padTop = r.height * (62 / 844);
-        var padBot = r.height * (34 / 844);
-        var radius = r.width * (55 / 390);
-        safariEl.style.setProperty("--ss-pad-top", Math.round(padTop) + "px");
-        safariEl.style.setProperty("--ss-pad-bottom", Math.round(padBot) + "px");
-        safariEl.style.setProperty("--ss-radius", Math.round(radius) + "px");
-      }
-      if (isIOS) {
-        updateSafariMetrics();
-        window.addEventListener("resize", function () {
-          requestAnimationFrame(updateSafariMetrics);
-        }, { passive: true });
-      }
+      document.getElementById("previewFrameSafari").src = finalUrl;
 
       // Live clock in the status bar.
       const timeEl = document.getElementById("statusTime");
