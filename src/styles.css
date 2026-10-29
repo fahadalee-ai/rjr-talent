@@ -1,0 +1,486 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --radius: 16px;
+  --radius-sm: 12px;
+  --radius-md: 14px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-3xl: 28px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-pressed: var(--primary-pressed);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-grouped: var(--grouped);
+  --color-tint: var(--tint);
+  --color-separator: var(--separator);
+  --color-star: var(--star);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-secondary-text: var(--text-secondary);
+  --color-sidebar: var(--card);
+  --color-sidebar-foreground: var(--foreground);
+  --color-sidebar-primary: var(--primary);
+  --color-sidebar-primary-foreground: var(--primary-foreground);
+  --color-sidebar-accent: var(--tint);
+  --color-sidebar-accent-foreground: var(--foreground);
+  --color-sidebar-border: var(--separator);
+  --color-sidebar-ring: var(--primary);
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui,
+    sans-serif;
+  --font-display:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", system-ui,
+    sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #0b0b1a;
+  --grouped: #f2f2f7;
+  --card: #ffffff;
+  --card-foreground: #0b0b1a;
+  --popover: #ffffff;
+  --popover-foreground: #0b0b1a;
+  --primary: #0001ff;
+  --primary-foreground: #ffffff;
+  --primary-pressed: #0000cc;
+  --secondary: #e8e8ff;
+  --secondary-foreground: #0001ff;
+  --muted: #f2f2f7;
+  --muted-foreground: #6b6b80;
+  --accent: #e8e8ff;
+  --accent-foreground: #0001ff;
+  --destructive: #ff3b30;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5ea;
+  --input: #e5e5ea;
+  --ring: #0001ff;
+  --tint: #e8e8ff;
+  --separator: #e5e5ea;
+  --text-secondary: #6b6b80;
+  --star: #ffc83d;
+  --success: #34c759;
+  --danger: #ff3b30;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #000000;
+  --foreground: #ffffff;
+  --grouped: #000000;
+  --card: #2c2c2e;
+  --card-foreground: #ffffff;
+  --popover: #2c2c2e;
+  --popover-foreground: #ffffff;
+  --primary: #4d4dff;
+  --primary-foreground: #ffffff;
+  --primary-pressed: #3333e6;
+  --secondary: #1a1a4d;
+  --secondary-foreground: #c8c8ff;
+  --muted: #1c1c1e;
+  --muted-foreground: #a1a1b5;
+  --accent: #1a1a4d;
+  --accent-foreground: #c8c8ff;
+  --destructive: #ff453a;
+  --destructive-foreground: #ffffff;
+  --border: #38383a;
+  --input: #38383a;
+  --ring: #4d4dff;
+  --tint: #1a1a4d;
+  --separator: #38383a;
+  --text-secondary: #a1a1b5;
+  --star: #ffc83d;
+  --success: #30d158;
+  --danger: #ff453a;
+}
+
+:root {
+  --status-bar: 0px;
+  --nav-bar: 44px;
+  --tab-bar: 49px;
+  --tab-inset: 34px;
+}
+
+html.android {
+  --status-bar: 0px;
+  --nav-bar: 56px;
+  --tab-bar: 80px;
+  --tab-inset: 0px;
+}
+
+@layer base {
+  * {
+    border-color: var(--separator);
+  }
+
+  html,
+  body {
+    height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: #d8d8de;
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  input,
+  textarea,
+  p,
+  li,
+  h1,
+  h2,
+  h3 {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  .dark body {
+    background: #000000;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+.status-bar {
+  height: max(var(--status-bar), env(safe-area-inset-top, 0px));
+}
+
+.nav-bar {
+  height: var(--nav-bar);
+}
+
+.tab-bar {
+  padding-bottom: max(var(--tab-inset), env(safe-area-inset-bottom, 0px));
+}
+
+.tab-bar-row {
+  display: grid;
+  height: var(--tab-bar);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.android-only {
+  display: none;
+}
+
+html.android .android-only {
+  display: block;
+}
+
+html.android .ios-only {
+  display: none;
+}
+
+html.android .tab-item[aria-current="page"] .android-pill {
+  position: absolute;
+  inset: -6px -14px;
+  z-index: -1;
+  background: var(--tint);
+}
+
+.screen-shell {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.screen-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.screen-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.screen-scroll.pad-status {
+  padding-top: max(var(--status-bar), env(safe-area-inset-top, 0px));
+}
+
+.app-frame {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-screen {
+  position: relative;
+  height: 100dvh;
+  max-width: 430px;
+  margin-inline: auto;
+  overflow: hidden;
+}
+
+.motion-push {
+  animation: screen-push 300ms ease-out both;
+}
+
+.motion-pop {
+  animation: screen-pop 300ms ease-out both;
+}
+
+@keyframes screen-push {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes screen-pop {
+  from {
+    transform: translateX(-24%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+button:active,
+a:active,
+[role="button"]:active {
+  opacity: 0.6;
+}
+
+button:disabled:active {
+  opacity: 0.4;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(110%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(8px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-140%) skewX(-18deg);
+  }
+  100% {
+    transform: translateX(240%) skewX(-18deg);
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ken {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes beam {
+  0% {
+    transform: rotate(0deg);
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: rotate(18deg);
+    opacity: 0.35;
+  }
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-sheet {
+  animation: sheet-up 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-fade {
+  animation: fade-in 0.22s ease both;
+}
+
+.animate-shake {
+  animation: shake 0.42s ease;
+}
+
+.animate-pop {
+  animation: pop-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-check {
+  animation: check-pop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-ken {
+  animation: ken 12s ease-out forwards;
+}
+
+.delay-1 {
+  animation-delay: 0.3s;
+}
+
+.delay-2 {
+  animation-delay: 0.55s;
+}
+
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-sheet,
+  .animate-fade,
+  .animate-shake,
+  .animate-pop,
+  .animate-check,
+  .animate-ken,
+  .motion-push,
+  .motion-pop {
+    animation: none !important;
+  }
+}
