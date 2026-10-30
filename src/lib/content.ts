@@ -447,21 +447,21 @@ export const testimonials: Testimonial[] = [
 ];
 
 export const heroImage = photo("hero-home.jpg");
-export const splashImage = photo("splash-lights.jpg");
+export const splashImage = photo("splash-stage.jpg");
 
 export const onboarding = [
   {
-    image: photo("onboarding-wedding.jpg"),
+    image: photo("onboarding-band.jpg"),
     title: "Talent You Can Count On",
     body: "Discover professional bands, DJs, magicians, dancers and more, all vetted by a licensed agency.",
   },
   {
-    image: photo("onboarding-magician.jpg"),
+    image: photo("onboarding-dj.jpg"),
     title: "Entertainment Tailored to Your Event",
     body: "Live music, specialty acts, or fully custom entertainment, built around your vision and venue.",
   },
   {
-    image: photo("onboarding-festival.jpg"),
+    image: photo("onboarding-show.jpg"),
     title: "Request a Talent in Minutes",
     body: "Tell us about your event, and our team will get back to you with the perfect lineup.",
   },

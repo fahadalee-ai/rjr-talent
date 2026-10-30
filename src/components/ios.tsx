@@ -39,6 +39,8 @@ export function AppHeader({
   title,
   trailing,
   eyebrow,
+  children,
+  collapse = true,
 }: {
   title: string;
   subtitle?: string;
@@ -46,31 +48,31 @@ export function AppHeader({
   eyebrow?: ReactNode;
   children?: ReactNode;
   large?: boolean;
+  collapse?: boolean;
 }) {
   const { scrolled } = useContext(ChromeContext);
-  const showBar = scrolled || Boolean(eyebrow) || Boolean(trailing);
+  const showBar = collapse && (scrolled || Boolean(eyebrow) || Boolean(trailing));
   return (
     <header
       className={cn(
         "z-30 shrink-0 bg-black text-white",
-        scrolled && "border-b-[0.5px] border-white/25",
+        collapse && scrolled && "border-b-[0.5px] border-white/25",
       )}
     >
       <div className="status-bar" />
       {showBar ? (
-        <div className="nav-bar relative flex items-center gap-2 px-2">
-          <div className="flex min-w-0 flex-1 items-center">{eyebrow}</div>
-          <h1
-            className={cn(
-              "pointer-events-none absolute inset-x-16 truncate text-center text-[17px] font-semibold leading-[1.3] transition-opacity duration-150",
-              scrolled ? "opacity-100" : "opacity-0",
+        <div className="nav-bar flex items-center gap-2 px-3">
+          <div className="min-w-0 flex-1">
+            {scrolled || !eyebrow ? (
+              <h1 className="truncate text-[16px] font-semibold leading-none">{title}</h1>
+            ) : (
+              eyebrow
             )}
-          >
-            {title}
-          </h1>
+          </div>
           {trailing ? <div className="flex shrink-0 items-center">{trailing}</div> : null}
         </div>
       ) : null}
+      {children}
     </header>
   );
 }
@@ -127,7 +129,7 @@ export function Button({
         if (!props.disabled) haptic("tap");
       }}
       className={cn(
-        "inline-flex h-[50px] w-full items-center justify-center gap-2 rounded-[14px] px-4 text-[17px] font-semibold transition-opacity duration-150 disabled:pointer-events-none disabled:opacity-40",
+        "inline-flex h-11 w-full items-center justify-center gap-2 rounded-[12px] px-4 text-[15px] font-semibold transition-opacity duration-150 disabled:pointer-events-none disabled:opacity-40",
         variant === "primary" && "bg-primary text-white active:bg-primary-pressed",
         variant === "secondary" && "bg-tint text-primary",
         variant === "tertiary" && "h-11 bg-transparent text-primary",
@@ -159,7 +161,7 @@ export function TextField({
         <input
           id={fieldId}
           className={cn(
-            "h-[52px] w-full rounded-[12px] bg-card px-4 text-[17px] text-foreground outline-none ring-1 ring-separator placeholder:text-secondary-text focus:ring-2 focus:ring-primary",
+            "h-11 w-full rounded-[12px] bg-card px-3 text-[16px] text-foreground outline-none ring-1 ring-separator placeholder:text-secondary-text focus:ring-2 focus:ring-primary",
             typeof props.value === "string" && props.value.length > 0 && "pr-12",
             error && "ring-danger focus:ring-danger",
           )}
@@ -242,13 +244,13 @@ export function SearchField({
   placeholder?: string;
 }) {
   return (
-    <label className="flex h-12 items-center gap-2 rounded-[12px] bg-card px-3 ring-1 ring-separator">
-      <Search className="size-5 text-secondary-text" aria-hidden />
+    <label className="flex h-11 items-center gap-2 rounded-[12px] bg-white px-3 text-foreground ring-1 ring-black/10">
+      <Search className="size-5 shrink-0 text-secondary-text" aria-hidden />
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="h-full min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-secondary-text"
+        className="h-full min-w-0 flex-1 bg-transparent text-[16px] leading-none text-foreground outline-none placeholder:text-secondary-text"
       />
       {value ? (
         <button
@@ -380,7 +382,7 @@ export function Sheet({
         className="screen-scroll animate-sheet relative max-h-[88dvh] w-full max-w-[430px] rounded-t-[16px] bg-card px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-2 shadow-[0_1px_2px_rgba(11,11,26,0.12)]"
       >
         <div className="mx-auto mb-3 h-[5px] w-9 rounded-full bg-separator" />
-        {title ? <h2 className="mb-3 text-[22px] font-semibold">{title}</h2> : null}
+        {title ? <h2 className="mb-2 text-[18px] font-semibold">{title}</h2> : null}
         {children}
       </div>
     </div>
@@ -523,12 +525,12 @@ export function LargeTitle({
   inverted?: boolean;
 }) {
   return (
-    <div className={cn("px-4 pb-4 pt-4", inverted && "bg-black text-white")}>
-      <h1 className="text-[34px] font-bold leading-[1.2] tracking-tight">{title}</h1>
+    <div className={cn("px-4 pb-3 pt-3", inverted && "bg-black text-white")}>
+      <h1 className="text-[26px] font-bold leading-[1.2] tracking-tight">{title}</h1>
       {subtitle ? (
         <p
           className={cn(
-            "mt-2 text-[15px] leading-[1.4]",
+            "mt-1 text-[13px] leading-[1.4]",
             inverted ? "text-white/70" : "text-secondary-text",
           )}
         >
@@ -588,7 +590,7 @@ export function SectionHeader({
 }) {
   return (
     <div className="mb-2 flex items-end justify-between px-4">
-      <h2 className="text-[22px] font-semibold tracking-tight">{title}</h2>
+      <h2 className="text-[18px] font-semibold tracking-tight">{title}</h2>
       {action && to ? (
         <Link
           to={to}
@@ -618,7 +620,7 @@ export function EmptyState({
       <div className="mx-auto grid size-14 place-items-center rounded-full bg-tint text-primary">
         <Icon className="size-7" />
       </div>
-      <h2 className="mt-4 text-[22px] font-semibold">{title}</h2>
+      <h2 className="mt-3 text-[18px] font-semibold">{title}</h2>
       <p className="mt-2 text-[15px] leading-relaxed text-secondary-text">{body}</p>
       {action ? <div className="mt-5">{action}</div> : null}
     </div>
@@ -636,7 +638,7 @@ export function ErrorState({
 }) {
   return (
     <div className="mx-4 rounded-[16px] border border-separator bg-card px-4 py-8 text-center shadow-[0_1px_2px_rgba(11,11,26,0.06)]">
-      <h2 className="text-[22px] font-semibold">{title}</h2>
+      <h2 className="text-[18px] font-semibold">{title}</h2>
       <p className="mt-2 text-[15px] leading-relaxed text-secondary-text">{body}</p>
       <div className="mt-5">
         <Button onClick={onRetry}>Try Again</Button>
@@ -660,10 +662,11 @@ const tabs = [
 export function BottomTabBar() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   return (
-    <nav className="tab-bar z-40 shrink-0 border-t-[0.5px] border-separator bg-white/92 backdrop-blur-xl dark:bg-black/92">
+    <nav className="tab-bar z-40 shrink-0 bg-[#0001FF] text-white">
       <div className="tab-bar-row">
         {tabs.map((tab) => {
           const active = pathname === tab.to || pathname.startsWith(`${tab.to}/`);
+          const featured = tab.to === "/request";
           const Icon = tab.icon;
           return (
             <Link
@@ -675,19 +678,24 @@ export function BottomTabBar() {
                 if (tab.to === "/gallery") sessionStorage.setItem("rjr-gallery-tab", "photos");
               }}
               aria-current={active ? "page" : undefined}
-              className="tab-item flex min-h-11 flex-col items-center justify-center gap-1 transition-opacity duration-150"
+              className="tab-item flex h-full flex-col items-center justify-center gap-1 transition-opacity duration-150"
             >
-              <span className="relative grid size-6 place-items-center">
+              <span
+                className={cn(
+                  "relative grid size-8 place-items-center rounded-full",
+                  featured ? "bg-white" : active && "bg-white/20",
+                )}
+              >
                 <span className="android-pill" />
                 <Icon
-                  className={cn("size-6", active ? "text-primary" : "text-secondary-text")}
-                  strokeWidth={active ? 2.5 : 2}
+                  className={cn("size-5", featured ? "text-[#0001FF]" : "text-white")}
+                  strokeWidth={featured || active ? 2.5 : 1.75}
                 />
               </span>
               <span
                 className={cn(
-                  "text-[11px] font-medium leading-none",
-                  active ? "text-primary" : "text-secondary-text",
+                  "text-[10px] leading-none",
+                  featured || active ? "font-semibold text-white" : "font-medium text-white/70",
                 )}
               >
                 {tab.label}
@@ -720,12 +728,20 @@ export function ScreenContainer({
 }) {
   const [scrolled, setScrolled] = useState(false);
   const chrome: ReactNode[] = [];
+  const footer: ReactNode[] = [];
   const body: ReactNode[] = [];
   let overlay = false;
 
   Children.forEach(children, (child, index) => {
     if (!isChrome(child)) {
       body.push(child);
+      return;
+    }
+    if (
+      isValidElement(child) &&
+      (child.props as { "data-chrome"?: string })["data-chrome"] === "footer"
+    ) {
+      footer.push(child);
       return;
     }
     chrome.push(child);
@@ -738,6 +754,27 @@ export function ScreenContainer({
       large?: boolean;
       children?: ReactNode;
     };
+    const hasTools = props.children != null;
+    if (props.large !== false && props.title && hasTools) {
+      chrome[chrome.length - 1] = cloneElement(
+        child as ReactElement<{ children?: ReactNode; collapse?: boolean }>,
+        {
+          collapse: false,
+          children: (
+            <>
+              <div className="px-4 pb-1 pt-2">
+                <h1 className="text-[26px] font-bold leading-[1.2] tracking-tight">{props.title}</h1>
+                {props.subtitle ? (
+                  <p className="mt-1 text-[13px] leading-[1.4] text-white/70">{props.subtitle}</p>
+                ) : null}
+              </div>
+              <div className="px-4 pb-4">{props.children}</div>
+            </>
+          ),
+        },
+      );
+      return;
+    }
     if (props.large !== false && props.title) {
       body.unshift(
         <LargeTitle
@@ -750,7 +787,7 @@ export function ScreenContainer({
     }
     if (props.children) {
       body.push(
-        <div key={`tools-${index}`} className="px-4 pb-3">
+        <div key={`tools-${index}`} className="px-4 pb-3 pt-3">
           {props.children}
         </div>,
       );
@@ -772,6 +809,7 @@ export function ScreenContainer({
           <div className="h-6" />
         </div>
         {overlay ? <div className="absolute inset-x-0 top-0 z-30">{chrome}</div> : null}
+        {footer}
         {tab ? <BottomTabBar /> : null}
       </div>
     </ChromeContext.Provider>
@@ -817,7 +855,7 @@ export function Row({
       {Icon ? (
         <Icon className={cn("size-6", destructive ? "text-danger" : "text-primary")} />
       ) : null}
-      <span className={cn("flex-1 text-left text-[17px]", destructive && "text-danger")}>
+      <span className={cn("flex-1 text-left text-[15px]", destructive && "text-danger")}>
         {label}
       </span>
       {value ? (

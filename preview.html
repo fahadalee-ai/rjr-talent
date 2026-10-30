@@ -89,14 +89,10 @@
     }
 
     /*
-        Screen glass inside the 427x881 frame:
-        x=18, y=18, w=390, h=844.
-        Top padding clears the clock and island.
-        Corner radii match the glass (55px): 14.1% of width, 6.52% of height.
+        Screen glass: x=18, y=18, w=390, h=844 inside the 427x881 frame.
+        The iframe sits below the clock, signal, and battery, and above the home indicator.
       */
     .safariScreen {
-      display: flex;
-      flex-direction: column;
       position: absolute;
       left: 4.2155%;
       top: 2.0431%;
@@ -104,7 +100,6 @@
       height: 95.8002%;
       z-index: 2;
       overflow: hidden;
-      padding: 7.35% 0 0;
       background: #000;
       border-radius: 14.1% / 6.52%;
       clip-path: inset(0 round 14.1% / 6.52%);
@@ -141,10 +136,12 @@
     }
 
     .safariScreen iframe {
-      flex: 1 1 0;
+      position: absolute;
+      left: 0;
+      top: 7.6%;
       width: 100%;
-      height: 0;
-      min-height: 0;
+      height: calc(100% - 7.6% - 4.2%);
+      border: 0;
       border-radius: 0;
     }
   </style>
@@ -257,7 +254,7 @@
         </g>
 
         <!-- Home indicator -->
-        <rect width="139" height="5" rx="2.5" transform="matrix(-1 0 0 1 284 849)" style="fill: var(--homeBar)"></rect>
+        <rect width="139" height="5" rx="2.5" transform="matrix(-1 0 0 1 284 849)" fill="rgba(255,255,255,0.85)"></rect>
 
         <!-- Dynamic Island -->
         <rect x="151.666" y="31.667" width="123.333" height="36" rx="18" fill="black"></rect>

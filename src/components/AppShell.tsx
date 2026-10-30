@@ -26,16 +26,39 @@ export function AppShell({ children }: { children: ReactNode }) {
       return;
     }
     const switchingTabs = Boolean(last && tabRoots.has(last) && tabRoots.has(pathname));
-    setMotion(last && !switchingTabs ? "push" : "none");
+    const quiet = pathname === "/" || pathname === "/onboarding";
+    setMotion(last && !switchingTabs && !quiet ? "push" : "none");
     stack.current = [...previous, pathname];
+  }, [pathname]);
+
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
+  }, []);
+
+  useEffect(() => {
+    const reset = () => {
+      window.scrollTo(0, 0);
+      document.querySelectorAll(".screen-scroll").forEach((node) => {
+        node.scrollTop = 0;
+      });
+    };
+    reset();
+    const frame = window.requestAnimationFrame(reset);
+    return () => window.cancelAnimationFrame(frame);
   }, [pathname]);
 
   useEffect(() => {
     const onFocus = (event: FocusEvent) => {
       const target = event.target;
       if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+      const scroller = target.closest(".screen-scroll");
+      if (!(scroller instanceof HTMLElement)) return;
       window.setTimeout(() => {
-        target.scrollIntoView({ block: "center", behavior: "smooth" });
+        const field = target.getBoundingClientRect();
+        const view = scroller.getBoundingClientRect();
+        const hidden = field.bottom > view.bottom - 8 || field.top < view.top + 8;
+        if (!hidden) return;
+        target.scrollIntoView({ block: "nearest", behavior: "smooth" });
       }, 280);
     };
     document.addEventListener("focusin", onFocus);

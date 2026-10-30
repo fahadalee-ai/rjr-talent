@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Bell, ChevronRight, Clapperboard, Phone, Plus, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
-import { AppHeader, Card, ScreenContainer, SectionHeader, Skeleton, Stars } from "../ios";
+import { Card, ScreenContainer, SectionHeader, Skeleton, Stars } from "../ios";
 import {
   heroImage,
   occasions,
@@ -37,28 +37,33 @@ export function HomeScreen() {
 
   return (
     <ScreenContainer tab>
-      <AppHeader
-        title={first ? `Hello, ${first}` : "Welcome"}
-        subtitle="Licensed talent agency · Winter Garden, Florida"
-        eyebrow={
-          <span className="pl-2 text-[17px] font-semibold tracking-tight">RJR Talent</span>
-        }
-        trailing={
+      <header data-chrome className="z-30 shrink-0 bg-[#07070f] text-white">
+        <div className="status-bar" />
+        <div className="flex items-center gap-3 px-4 py-2.5">
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#9aa0ff]">
+              Licensed agency
+            </p>
+            <p className="mt-1 text-[17px] font-bold leading-none tracking-tight">
+              RJR <span className="font-medium text-white/75">Talent</span>
+            </p>
+          </div>
           <Link
             to="/notifications"
             aria-label={unreadCount ? `${unreadCount} unread notifications` : "Notifications"}
-            className="relative grid size-11 place-items-center text-white"
+            className="relative grid size-10 place-items-center rounded-full bg-white/10 text-white"
             onClick={() => haptic("tap")}
           >
-            <Bell className="size-6" />
+            <Bell className="size-5" />
             {unreadCount > 0 ? (
-              <span className="absolute right-1 top-1 grid min-w-5 place-items-center bg-danger px-1 text-[12px] font-semibold text-white">
+              <span className="absolute -right-0.5 -top-0.5 grid min-h-4 min-w-4 place-items-center rounded-full bg-danger px-1 text-[10px] font-semibold text-white">
                 {unreadCount}
               </span>
             ) : null}
           </Link>
-        }
-      />
+        </div>
+        <div className="h-[3px] bg-[#0001FF]" />
+      </header>
       {loading ? (
         <div className="space-y-4 px-4 pt-4">
           <Skeleton className="h-64 w-full rounded-[20px]" />
@@ -70,28 +75,34 @@ export function HomeScreen() {
           <Skeleton className="h-40 w-full" />
         </div>
       ) : (
-        <div className="animate-rise space-y-8 pt-4">
+        <div className="animate-rise space-y-5 pt-4">
           <div className="px-4">
-            <div className="relative overflow-hidden rounded-[20px] shadow-[0_4px_16px_rgba(0,1,255,0.12)]">
+            <div className="relative overflow-hidden rounded-[20px] shadow-[0_10px_28px_rgba(7,7,15,0.18)]">
               <img
                 src={heroImage}
                 alt="Guests dancing at a live event"
-                className="h-72 w-full object-cover"
+                className="h-[248px] w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/15" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#07070f] via-[#07070f]/55 to-[#07070f]/5" />
               <div className="absolute inset-x-0 bottom-0 p-4">
-                <p className="text-[22px] font-semibold leading-snug text-white">{TAGLINE}</p>
-                <div className="mt-4 grid grid-cols-2 gap-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70">
+                  Winter Garden, Florida
+                </p>
+                <h1 className="mt-1 text-[24px] font-bold leading-tight text-white">
+                  {first ? `Hello, ${first}` : "Welcome"}
+                </h1>
+                <p className="mt-1 text-[13px] leading-snug text-white/85">{TAGLINE}</p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => navigate({ to: "/request" })}
-                    className="h-[48px] rounded-[14px] bg-primary text-[15px] font-semibold text-white"
+                    className="h-10 rounded-full bg-[#0001FF] text-[13px] font-semibold text-white"
                   >
-                    Request Talent Now
+                    Request Talent
                   </button>
                   <a
                     href={`tel:${PHONE_TEL}`}
-                    className="flex h-[48px] items-center justify-center rounded-[14px] bg-white/15 text-[15px] font-semibold text-white ring-1 ring-white/40"
+                    className="flex h-10 items-center justify-center rounded-full bg-white text-[13px] font-semibold text-[#0001FF]"
                   >
                     Call Now
                   </a>
@@ -216,7 +227,7 @@ export function HomeScreen() {
           </section>
 
           <section className="px-4">
-            <h2 className="mb-3 text-[22px] font-semibold">How a Request Works</h2>
+            <h2 className="mb-3 text-[18px] font-semibold">How a Request Works</h2>
             <div className="space-y-3">
               {[
                 ["1", "Tell us about the event", "Date, venue, guests, and the feeling you want."],
@@ -245,7 +256,7 @@ export function HomeScreen() {
                 <p className="text-[12px] font-semibold uppercase tracking-wide text-white/80">
                   Let’s make it unforgettable
                 </p>
-                <h2 className="mt-1 text-[22px] font-semibold leading-snug">
+                <h2 className="mt-1 text-[18px] font-semibold leading-snug">
                   Founded in 2018. Fully insured. Based in Central Florida.
                 </h2>
                 <p className="mt-2 text-[15px] text-white/90">{PHONE_DISPLAY}</p>

@@ -120,14 +120,14 @@
 }
 
 :root {
-  --status-bar: 0px;
+  --status-bar: 15px;
   --nav-bar: 44px;
   --tab-bar: 49px;
   --tab-inset: 34px;
 }
 
 html.android {
-  --status-bar: 0px;
+  --status-bar: 15px;
   --nav-bar: 56px;
   --tab-bar: 80px;
   --tab-inset: 0px;
@@ -140,13 +140,14 @@ html.android {
 
   html,
   body {
-    height: 100dvh;
+    height: 100%;
+    max-height: 100%;
     overflow: hidden;
     overscroll-behavior: none;
     background: #d8d8de;
     color: var(--foreground);
     font-family: var(--font-sans);
-    font-size: 17px;
+    font-size: 15px;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     -webkit-tap-highlight-color: transparent;
@@ -201,6 +202,8 @@ html.android {
 }
 
 .tab-bar {
+  position: relative;
+  z-index: 40;
   padding-bottom: max(var(--tab-inset), env(safe-area-inset-bottom, 0px));
 }
 
@@ -242,6 +245,7 @@ html.android .tab-item[aria-current="page"] .android-pill {
   flex: 1;
   overflow-x: hidden;
   overflow-y: auto;
+  overflow-anchor: none;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -256,24 +260,25 @@ html.android .tab-item[aria-current="page"] .android-pill {
 }
 
 .app-frame {
-  height: 100dvh;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
 }
 
 .app-screen {
-  position: relative;
-  height: 100dvh;
+  position: absolute;
+  inset: 0;
   max-width: 430px;
   margin-inline: auto;
   overflow: hidden;
 }
 
 .motion-push {
-  animation: screen-push 300ms ease-out both;
+  animation: screen-push 280ms ease-out;
 }
 
 .motion-pop {
-  animation: screen-pop 300ms ease-out both;
+  animation: screen-pop 280ms ease-out;
 }
 
 @keyframes screen-push {
@@ -281,7 +286,7 @@ html.android .tab-item[aria-current="page"] .android-pill {
     transform: translateX(100%);
   }
   to {
-    transform: translateX(0);
+    transform: none;
   }
 }
 
@@ -290,7 +295,7 @@ html.android .tab-item[aria-current="page"] .android-pill {
     transform: translateX(-24%);
   }
   to {
-    transform: translateX(0);
+    transform: none;
   }
 }
 
@@ -463,12 +468,6 @@ button:disabled:active {
 
 .delay-2 {
   animation-delay: 0.55s;
-}
-
-*,
-*::before,
-*::after {
-  border-radius: 0 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

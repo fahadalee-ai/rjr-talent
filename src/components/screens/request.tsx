@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
+import { Check } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Input, ScreenContainer, Segmented, Stepper } from "../ios";
+import { Button, Input, ScreenContainer, Stepper } from "../ios";
 import { occasions, occasionById, talentBySlug, talents } from "../../lib/content";
 import { haptic } from "../../lib/haptics";
 import { useApp, type AccountType } from "../../lib/store";
@@ -24,7 +25,13 @@ type Draft = {
   accountType: AccountType;
 };
 
-const steps = ["Event", "When & where", "Talent", "Your details", "Review"];
+const steps = [
+  { title: "Event", hint: "Choose the occasion" },
+  { title: "When & where", hint: "Date, place, and how long" },
+  { title: "Talent", hint: "Select one or more acts" },
+  { title: "Your details", hint: "How should we reach you?" },
+  { title: "Review", hint: "Confirm before you send" },
+];
 
 function readPrefill() {
   if (typeof sessionStorage === "undefined") return { event: "", talent: "" };
@@ -93,6 +100,12 @@ export function RequestScreen() {
 
   const patch = (partial: Partial<Draft>) => setDraft((current) => ({ ...current, ...partial }));
 
+  useEffect(() => {
+    document.querySelectorAll(".screen-scroll").forEach((node) => {
+      node.scrollTop = 0;
+    });
+  }, [step]);
+
   const next = () => {
     if (step < steps.length - 1) {
       if (step === 3) {
@@ -133,20 +146,29 @@ export function RequestScreen() {
     }, 700);
   };
 
+  const current = steps[step] ?? steps[0];
+  const talentNames = draft.talentSlugs
+    .map((slug) => talentBySlug(slug)?.title)
+    .filter(Boolean)
+    .join(", ");
+
   if (done) {
     return (
       <ScreenContainer tab>
-        <div style={{ height: "env(safe-area-inset-top, 0px)" }} />
-        <div className="px-4 pt-8 text-center">
-          <div className="animate-check mx-auto grid size-20 place-items-center rounded-full bg-success text-4xl text-white">
-            ✓
+        <div className="status-bar" />
+        <div className="flex flex-col items-center px-6 pt-10 text-center">
+          <div className="animate-check grid size-16 place-items-center rounded-full bg-[#0001FF] text-white">
+            <Check className="size-8" strokeWidth={2.5} />
           </div>
-          <h1 className="mt-5 text-[34px] font-bold leading-tight">Request sent</h1>
-          <p className="mt-2 text-[17px] leading-relaxed text-secondary-text">
-            Reference {done.reference}. Our team will follow up about your{" "}
-            {draft.eventType.toLowerCase()}.
+          <h1 className="mt-5 text-[24px] font-bold leading-tight">Request sent</h1>
+          <p className="mt-2 max-w-[18rem] text-[14px] leading-snug text-secondary-text">
+            Our team will follow up
+            {draft.eventType ? ` about your ${draft.eventType.toLowerCase()}` : ""}.
           </p>
-          <div className="mt-8 space-y-3">
+          <p className="mt-4 rounded-full bg-tint px-3 py-1 text-[13px] font-semibold text-[#0001FF]">
+            {done.reference}
+          </p>
+          <div className="mt-8 w-full space-y-3">
             <Button onClick={() => navigate({ to: "/requests/$id", params: { id: done.id } })}>
               View Request
             </Button>
@@ -161,40 +183,43 @@ export function RequestScreen() {
 
   return (
     <ScreenContainer tab>
-      <header data-chrome className="z-30 shrink-0 bg-black text-white">
+      <header data-chrome className="z-30 shrink-0 bg-[#07070f] text-white">
         <div className="status-bar" />
         <div className="px-4 pb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex h-8 items-center justify-between">
             {step > 0 ? (
               <button
                 type="button"
-                className="flex min-h-11 items-center text-[17px] font-medium text-white"
+                className="text-[14px] font-semibold text-white"
                 onClick={() => setStep(step - 1)}
               >
                 Back
               </button>
             ) : (
-              <span className="text-[13px] font-semibold uppercase tracking-wide text-white/70">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/60">
                 Request
               </span>
             )}
-            <p className="text-[13px] font-semibold text-white/70">
-              Step {step + 1} of {steps.length}
+            <p className="text-[12px] font-semibold text-white/70">
+              {step + 1} / {steps.length}
             </p>
           </div>
-          <div className="mt-3 h-1 bg-white/25">
-            <div
-              className="h-full bg-white transition-all duration-300"
-              style={{ width: `${((step + 1) / steps.length) * 100}%` }}
-            />
+          <div className="mt-2 flex gap-1">
+            {steps.map((item, index) => (
+              <span
+                key={item.title}
+                className={cn(
+                  "h-1 flex-1 rounded-full",
+                  index <= step ? "bg-[#0001FF]" : "bg-white/20",
+                )}
+              />
+            ))}
           </div>
-          <h1 className="mt-3 text-[28px] font-bold leading-none tracking-tight">
-            {steps[step] ?? "Request"}
-          </h1>
-          <p className="mt-1.5 text-[13px] text-white/70">Request a Talent</p>
+          <h1 className="mt-3 text-[22px] font-bold leading-none tracking-tight">{current.title}</h1>
+          <p className="mt-1.5 text-[13px] text-white/70">{current.hint}</p>
         </div>
       </header>
-      <div className="space-y-4 px-4 pt-4">
+      <div className="space-y-4 px-4 pb-2 pt-4">
         {step === 0 ? (
           <div className="grid grid-cols-2 gap-2">
             {occasions.map((occasion) => {
@@ -205,20 +230,28 @@ export function RequestScreen() {
                   type="button"
                   onClick={() => patch({ eventType: occasion.label })}
                   className={cn(
-                    "min-h-[72px] rounded-[16px] px-3 py-3 text-left",
-                    selected
-                      ? "bg-primary text-white"
-                      : "bg-card text-foreground shadow-[0_4px_16px_rgba(0,1,255,0.05)]",
+                    "relative min-h-[92px] rounded-[16px] px-3 py-3 text-left shadow-[0_4px_16px_rgba(0,1,255,0.05)]",
+                    selected ? "bg-tint ring-2 ring-[#0001FF]" : "bg-card",
                   )}
                 >
-                  <span className="block text-[15px] font-semibold">{occasion.label}</span>
+                  {selected ? (
+                    <span className="absolute right-2 top-2 grid size-5 place-items-center rounded-full bg-[#0001FF] text-white">
+                      <Check className="size-3" strokeWidth={3} />
+                    </span>
+                  ) : null}
+                  <span className="block pr-4 text-[15px] font-semibold leading-tight">
+                    {occasion.label}
+                  </span>
+                  <span className="mt-1 line-clamp-2 block text-[12px] leading-snug text-secondary-text">
+                    {occasion.blurb}
+                  </span>
                 </button>
               );
             })}
           </div>
         ) : null}
         {step === 1 ? (
-          <div className="space-y-4 rounded-[16px] bg-card p-4">
+          <div className="space-y-4 rounded-[16px] bg-card p-4 shadow-[0_4px_16px_rgba(0,1,255,0.05)]">
             <Input
               label="Date"
               name="date"
@@ -233,8 +266,8 @@ export function RequestScreen() {
               value={draft.time}
               onChange={(event) => patch({ time: event.target.value })}
             />
-            <div className="flex items-center justify-between">
-              <span className="text-[17px]">Hours</span>
+            <div className="flex items-center justify-between border-t border-separator pt-3">
+              <span className="text-[15px] font-medium">Hours</span>
               <Stepper
                 label="hours"
                 min={1}
@@ -243,8 +276,8 @@ export function RequestScreen() {
                 onChange={(hours) => patch({ hours })}
               />
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[17px]">Guests</span>
+            <div className="flex items-center justify-between border-t border-separator pt-3">
+              <span className="text-[15px] font-medium">Guests</span>
               <Stepper
                 label="guests"
                 min={10}
@@ -254,21 +287,28 @@ export function RequestScreen() {
                 onChange={(guests) => patch({ guests })}
               />
             </div>
-            <div>
+            <div className="border-t border-separator pt-3">
               <p className="mb-2 text-[15px] font-medium">Setting</p>
-              <Segmented
-                ariaLabel="Indoor or outdoor"
-                value={draft.setting}
-                onChange={(setting) => patch({ setting })}
-                options={[
-                  { id: "indoor", label: "Indoor" },
-                  { id: "outdoor", label: "Outdoor" },
-                ]}
-              />
+              <div className="grid grid-cols-2 gap-1 rounded-full bg-[#ececf4] p-1">
+                {(["indoor", "outdoor"] as const).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => patch({ setting: option })}
+                    className={cn(
+                      "h-10 rounded-full text-[14px] font-semibold capitalize",
+                      draft.setting === option ? "bg-[#0001FF] text-white" : "text-[#5c5c70]",
+                    )}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
             </div>
             <Input
               label="Venue"
               name="venue"
+              placeholder="Venue name"
               value={draft.venue}
               onChange={(event) => patch({ venue: event.target.value })}
             />
@@ -281,7 +321,7 @@ export function RequestScreen() {
           </div>
         ) : null}
         {step === 2 ? (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2.5">
             {talents.map((talent) => {
               const selected = draft.talentSlugs.includes(talent.slug);
               return (
@@ -296,17 +336,19 @@ export function RequestScreen() {
                     })
                   }
                   className={cn(
-                    "overflow-hidden rounded-[16px] text-left ring-2",
-                    selected ? "ring-primary" : "ring-transparent",
+                    "overflow-hidden rounded-[16px] text-left shadow-[0_4px_16px_rgba(0,1,255,0.06)] ring-2",
+                    selected ? "ring-[#0001FF]" : "ring-transparent",
                   )}
                 >
-                  <img src={talent.image} alt="" className="h-24 w-full object-cover" />
-                  <span
-                    className={cn(
-                      "block px-2 py-2 text-[15px] font-semibold",
-                      selected ? "bg-tint text-primary" : "bg-card",
-                    )}
-                  >
+                  <span className="relative block">
+                    <img src={talent.image} alt="" className="h-28 w-full object-cover" />
+                    {selected ? (
+                      <span className="absolute right-2 top-2 grid size-6 place-items-center rounded-full bg-[#0001FF] text-white">
+                        <Check className="size-3.5" strokeWidth={3} />
+                      </span>
+                    ) : null}
+                  </span>
+                  <span className="block bg-card px-2.5 py-2.5 text-[14px] font-semibold leading-tight">
                     {talent.title}
                   </span>
                 </button>
@@ -315,16 +357,32 @@ export function RequestScreen() {
           </div>
         ) : null}
         {step === 3 ? (
-          <div className="space-y-4">
-            <Segmented
-              ariaLabel="Booking as"
-              value={prefilled.accountType}
-              onChange={(accountType) => patch({ accountType })}
-              options={[
-                { id: "individual", label: "Individual" },
-                { id: "business", label: "Business" },
-              ]}
-            />
+          <div className="space-y-4 rounded-[16px] bg-card p-4 shadow-[0_4px_16px_rgba(0,1,255,0.05)]">
+            <div>
+              <p className="mb-2 text-[15px] font-medium">I’m booking as</p>
+              <div className="grid grid-cols-2 gap-1 rounded-full bg-[#ececf4] p-1">
+                {(
+                  [
+                    { id: "individual", label: "Individual" },
+                    { id: "business", label: "Business" },
+                  ] as const
+                ).map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => patch({ accountType: option.id })}
+                    className={cn(
+                      "h-10 rounded-full text-[14px] font-semibold",
+                      prefilled.accountType === option.id
+                        ? "bg-[#0001FF] text-white"
+                        : "text-[#5c5c70]",
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <Input
               label="Full Name"
               name="name"
@@ -360,44 +418,43 @@ export function RequestScreen() {
                 onChange={(event) => patch({ notes: event.target.value })}
                 rows={4}
                 placeholder="Theme, must-play songs, timing…"
-                className="w-full rounded-[12px] bg-card px-4 py-3 text-[17px] outline-none ring-1 ring-separator focus:ring-2 focus:ring-primary"
+                className="w-full rounded-[12px] bg-grouped px-3 py-3 text-[16px] outline-none ring-1 ring-separator focus:ring-2 focus:ring-primary"
               />
             </label>
           </div>
         ) : null}
         {step === 4 ? (
-          <div className="space-y-2 rounded-[16px] bg-card p-4 text-[15px]">
+          <div className="overflow-hidden rounded-[16px] bg-card shadow-[0_4px_16px_rgba(0,1,255,0.05)]">
             {[
-              ["Event", draft.eventType],
-              ["When", `${draft.date} · ${draft.time} · ${draft.hours} hrs`],
-              ["Where", `${draft.venue}, ${draft.city} · ${draft.setting}`],
-              ["Guests", String(draft.guests)],
+              ["Event", draft.eventType || "Not selected"],
+              ["When", [draft.date || "Date not set", draft.time, `${draft.hours} hrs`].join(" · ")],
               [
-                "Talent",
-                draft.talentSlugs
-                  .map((slug) => talentBySlug(slug)?.title)
-                  .filter(Boolean)
-                  .join(", "),
+                "Where",
+                [draft.venue || "Venue not set", draft.city, draft.setting].filter(Boolean).join(" · "),
               ],
-              ["Contact", `${prefilled.name} · ${prefilled.email}`],
-              ["Notes", draft.notes || "None"],
+              ["Guests", String(draft.guests)],
+              ["Talent", talentNames || "Not selected"],
+              ["Contact", [prefilled.name, prefilled.email, prefilled.phone].filter(Boolean).join(" · ") || "Not added"],
+              ["Notes", draft.notes.trim() || "None"],
             ].map(([label, value]) => (
-              <div key={label} className="border-b border-separator py-2 last:border-0">
-                <p className="text-[12px] font-semibold uppercase tracking-wide text-secondary-text">
+              <div key={label} className="border-b border-separator px-4 py-3 last:border-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-secondary-text">
                   {label}
                 </p>
-                <p className="text-[17px]">{value}</p>
+                <p className="mt-1 text-[15px] font-medium leading-snug">{value}</p>
               </div>
             ))}
             <button
               type="button"
-              className="pt-2 text-[15px] font-semibold text-primary"
+              className="w-full px-4 py-3 text-left text-[14px] font-semibold text-[#0001FF]"
               onClick={() => setStep(0)}
             >
-              Edit event
+              Edit from the start
             </button>
           </div>
         ) : null}
+      </div>
+      <div data-chrome="footer" className="shrink-0 border-t border-separator bg-grouped px-4 py-3">
         <Button disabled={sending} onClick={next}>
           {sending ? "Sending…" : step === steps.length - 1 ? "Submit Request" : "Continue"}
         </Button>

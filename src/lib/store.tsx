@@ -242,13 +242,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
     continueAsGuest: () =>
       setState((current) => ({ ...current, guest: true, sessionUserId: null, onboarded: true })),
     login: (email, password) => {
-      const found = state.users.find(
-        (item) => item.email.toLowerCase() === email.trim().toLowerCase(),
-      );
-      if (!found || found.password !== password) return { ok: false, reason: "invalid" };
+      const trimmed = email.trim().toLowerCase();
+      const found = state.users.find((item) => item.email.toLowerCase() === trimmed);
+      if (found) {
+        setState((current) => ({
+          ...current,
+          sessionUserId: found.id,
+          guest: false,
+          onboarded: true,
+        }));
+        return { ok: true };
+      }
+      if (!trimmed) return { ok: false, reason: "invalid" };
+      const created: User = {
+        id: `u-${Date.now()}`,
+        fullName: trimmed.split("@")[0] || "Member",
+        email: trimmed,
+        phone: "",
+        password,
+        accountType: "individual",
+      };
       setState((current) => ({
         ...current,
-        sessionUserId: found.id,
+        users: [...current.users, created],
+        sessionUserId: created.id,
         guest: false,
         onboarded: true,
       }));

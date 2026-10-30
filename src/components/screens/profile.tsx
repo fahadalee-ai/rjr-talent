@@ -18,7 +18,7 @@ import {
 } from "../ios";
 import { ADDRESS, EMAIL, PHONE_DISPLAY, PHONE_TEL } from "../../lib/content";
 import { haptic } from "../../lib/haptics";
-import { useApp, type ThemeMode } from "../../lib/store";
+import { useApp } from "../../lib/store";
 import { cn } from "../../lib/utils";
 
 export function ProfileScreen() {
@@ -40,84 +40,93 @@ export function ProfileScreen() {
     app.user ? item.userId === app.user.id || item.email === app.user.email : false,
   );
 
+  const initial = (app.user?.fullName || "G").slice(0, 1).toUpperCase();
+
   return (
     <ScreenContainer tab>
-      <AppHeader title="Profile" subtitle={app.user ? app.user.email : "Guest"} />
-      <div className="space-y-4 px-4 pt-4">
+      <AppHeader large={false} title="Profile" />
+      <div className="space-y-5 px-4 pb-6 pt-3">
         {app.user ? (
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="grid size-14 place-items-center rounded-full bg-tint text-[22px] font-bold text-primary">
-                {app.user.fullName.slice(0, 1)}
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-[20px] font-semibold">{app.user.fullName}</p>
-                <p className="text-[15px] capitalize text-secondary-text">
-                  {app.user.accountType}
-                  {app.user.company ? ` · ${app.user.company}` : ""}
-                </p>
+          <section className="overflow-hidden rounded-[20px] bg-[#07070f] text-white shadow-[0_10px_28px_rgba(0,1,255,0.16)]">
+            <div className="bg-gradient-to-br from-[#0001FF] via-[#0001FF] to-[#07070f] px-4 pb-5 pt-5">
+              <div className="flex items-center gap-3">
+                <div className="grid size-16 shrink-0 place-items-center rounded-full bg-white text-[24px] font-bold text-[#0001FF]">
+                  {initial}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-[18px] font-bold leading-tight">{app.user.fullName}</p>
+                  <p className="mt-0.5 truncate text-[13px] text-white/80">{app.user.email}</p>
+                  <span className="mt-2 inline-flex rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold capitalize">
+                    {app.user.accountType}
+                    {app.user.company ? ` · ${app.user.company}` : ""}
+                  </span>
+                </div>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setEditing(true)}
-              className="mt-3 text-[17px] font-semibold text-primary"
-            >
-              Edit profile
-            </button>
-          </Card>
+            <div className="grid grid-cols-2 divide-x divide-white/10 border-t border-white/10">
+              <Link to="/requests" onClick={() => haptic("tap")} className="px-4 py-3">
+                <p className="text-[20px] font-bold leading-none">{mine.length}</p>
+                <p className="mt-1 text-[12px] text-white/70">Requests</p>
+              </Link>
+              <Link to="/notifications" onClick={() => haptic("tap")} className="px-4 py-3">
+                <p className="text-[20px] font-bold leading-none">{app.unreadCount}</p>
+                <p className="mt-1 text-[12px] text-white/70">Alerts</p>
+              </Link>
+            </div>
+            <div className="px-4 pb-4">
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="h-10 w-full rounded-full bg-white text-[14px] font-semibold text-[#0001FF]"
+              >
+                Edit profile
+              </button>
+            </div>
+          </section>
         ) : (
-          <Card className="p-4">
-            <h2 className="text-[22px] font-semibold">Sign in to track requests</h2>
-            <p className="mt-1 text-[15px] leading-relaxed text-secondary-text">
-              Guests can browse and send an inquiry. An account keeps your requests in one place.
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-2">
+          <section className="overflow-hidden rounded-[20px] bg-[#07070f] text-white shadow-[0_10px_28px_rgba(0,1,255,0.16)]">
+            <div className="bg-gradient-to-br from-[#0001FF] to-[#07070f] px-4 py-5">
+              <div className="grid size-14 place-items-center rounded-full bg-white text-[22px] font-bold text-[#0001FF]">
+                G
+              </div>
+              <h2 className="mt-3 text-[20px] font-bold leading-tight">Your RJR account</h2>
+              <p className="mt-1 text-[13px] leading-snug text-white/75">
+                Sign in to keep every talent request, update, and message in one place.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 px-4 pb-4">
               <Button onClick={() => navigate({ to: "/login" })}>Log In</Button>
-              <Button variant="secondary" onClick={() => navigate({ to: "/register" })}>
+              <Button variant="white" onClick={() => navigate({ to: "/register" })}>
                 Register
               </Button>
             </div>
-          </Card>
+          </section>
         )}
 
-        <Card>
-          <ListItem
-            icon={Inbox}
-            label="My Requests"
-            value={app.user ? String(mine.length) : undefined}
-            to="/requests"
-          />
-          <ListItem
-            icon={Bell}
-            label="Notifications"
-            value={app.unreadCount ? `${app.unreadCount} new` : undefined}
-            to="/notifications"
-            last
-          />
-        </Card>
-
-        <div>
-          <p className="mb-2 px-1 text-[13px] font-semibold uppercase tracking-wide text-secondary-text">
-            Appearance
+        <section>
+          <p className="mb-2 px-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-secondary-text">
+            Activity
           </p>
-          <Card className="p-3">
-            <Segmented
-              ariaLabel="Appearance"
-              value={app.theme}
-              onChange={(theme: ThemeMode) => app.setTheme(theme)}
-              options={[
-                { id: "light", label: "Light" },
-                { id: "dark", label: "Dark" },
-                { id: "system", label: "System" },
-              ]}
+          <Card>
+            <ListItem
+              icon={Inbox}
+              label="My Requests"
+              value={app.user ? String(mine.length) : undefined}
+              to="/requests"
+            />
+            <ListItem
+              icon={Bell}
+              label="Notifications"
+              value={app.unreadCount ? `${app.unreadCount} new` : undefined}
+              to="/notifications"
+              last
             />
           </Card>
-        </div>
+        </section>
 
-        <div>
-          <p className="mb-2 px-1 text-[13px] font-semibold uppercase tracking-wide text-secondary-text">
-            Notifications
+        <section>
+          <p className="mb-2 px-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-secondary-text">
+            Updates
           </p>
           <Card>
             {(
@@ -130,11 +139,11 @@ export function ProfileScreen() {
               <div
                 key={key}
                 className={cn(
-                  "flex min-h-[52px] items-center justify-between px-4",
+                  "flex min-h-[52px] items-center justify-between gap-3 px-4",
                   index < list.length - 1 && "border-b border-separator",
                 )}
               >
-                <span className="text-[17px]">{label}</span>
+                <span className="text-[15px]">{label}</span>
                 <Switch
                   checked={app.prefs[key]}
                   label={label}
@@ -143,24 +152,39 @@ export function ProfileScreen() {
               </div>
             ))}
           </Card>
-        </div>
+        </section>
 
-        <Card>
-          <ListItem icon={Info} label="About RJR Talent" to="/about" />
-          <ListItem icon={Phone} label="Contact" to="/contact" />
-          <ListItem icon={FileText} label="Terms & Privacy" to="/legal" last />
-        </Card>
+        <section>
+          <p className="mb-2 px-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-secondary-text">
+            Agency
+          </p>
+          <Card>
+            <ListItem icon={Info} label="About RJR Talent" to="/about" />
+            <ListItem icon={Phone} label="Contact" to="/contact" />
+            <ListItem icon={FileText} label="Terms & Privacy" to="/legal" last />
+          </Card>
+          <div className="mt-3 rounded-[16px] bg-tint px-4 py-3">
+            <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-2 text-[14px] font-semibold text-[#0001FF]">
+              <Phone className="size-4" />
+              {PHONE_DISPLAY}
+            </a>
+            <a href={`mailto:${EMAIL}`} className="mt-2 flex items-center gap-2 text-[14px] font-semibold text-[#0001FF]">
+              <Mail className="size-4" />
+              {EMAIL}
+            </a>
+            <p className="mt-2 text-[12px] leading-snug text-secondary-text">{ADDRESS}</p>
+          </div>
+        </section>
 
         {app.user ? (
-          <Card>
-            <ListItem
-              icon={LogOut}
-              label="Log Out"
-              destructive
-              last
-              onClick={() => setConfirmOut(true)}
-            />
-          </Card>
+          <button
+            type="button"
+            onClick={() => setConfirmOut(true)}
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-[16px] bg-card text-[15px] font-semibold text-danger shadow-[0_1px_2px_rgba(11,11,26,0.06)]"
+          >
+            <LogOut className="size-5" />
+            Log Out
+          </button>
         ) : null}
       </div>
 
@@ -187,7 +211,7 @@ export function ProfileScreen() {
             }}
           >
             <div className="mx-auto mb-2 h-1.5 w-10 rounded-full bg-separator" />
-            <h2 className="text-[22px] font-semibold">Edit Profile</h2>
+            <h2 className="text-[18px] font-semibold">Edit Profile</h2>
             <TextField
               label="Full Name"
               name="name"
@@ -373,7 +397,7 @@ export function RequestDetail({ id }: { id: string }) {
       <NavBar title={item.reference} backTo="/requests" />
       <div className="space-y-4 px-4">
         <div>
-          <h1 className="text-[34px] font-bold leading-tight">{item.eventType}</h1>
+          <h1 className="text-[24px] font-bold leading-tight">{item.eventType}</h1>
           <p className="mt-1 text-[17px] text-secondary-text">{formatWhen(item.date, item.time)}</p>
         </div>
         <div className="rounded-[16px] bg-card p-4">
@@ -422,7 +446,7 @@ export function AboutScreen() {
     <ScreenContainer>
       <NavBar title="About" backTo="/profile" />
       <div className="space-y-4 px-4">
-        <h1 className="text-[34px] font-bold leading-tight">Talent you can count on</h1>
+        <h1 className="text-[24px] font-bold leading-tight">Talent you can count on</h1>
         <p className="text-[17px] leading-relaxed">
           Founded in 2018, RJR Talent is a licensed talent agency in Winter Garden, Florida. We
           connect Central Florida events with professional live bands, DJs, magicians, dancers,
@@ -464,7 +488,7 @@ export function ContactScreen() {
           <div className="animate-check mx-auto grid size-16 place-items-center rounded-full bg-success text-3xl text-white">
             ✓
           </div>
-          <h1 className="mt-4 text-[28px] font-bold">Message sent</h1>
+          <h1 className="mt-4 text-[22px] font-bold">Message sent</h1>
           <p className="mt-2 text-[17px] text-secondary-text">We’ll reply at {email}.</p>
           <div className="mt-6">
             <Button onClick={() => setSent(false)}>Send another</Button>
@@ -478,7 +502,7 @@ export function ContactScreen() {
     <ScreenContainer>
       <NavBar title="Contact" backTo="/profile" />
       <div className="space-y-4 px-4">
-        <h1 className="text-[34px] font-bold leading-tight">Let’s talk</h1>
+        <h1 className="text-[24px] font-bold leading-tight">Let’s talk</h1>
         <p className="text-[17px] text-secondary-text">
           Call, email, or send a note about your event.
         </p>
@@ -566,7 +590,7 @@ export function LegalScreen() {
         <div className="mt-4 space-y-3 text-[15px] leading-relaxed text-secondary-text">
           {tab === "terms" ? (
             <>
-              <h1 className="text-[28px] font-bold text-foreground">Terms of use</h1>
+              <h1 className="text-[22px] font-bold text-foreground">Terms of use</h1>
               <p>
                 RJR Talent provides this app so you can explore entertainment and send a booking
                 inquiry. Submitting a request is not a confirmed booking. Availability, pricing, and
@@ -583,7 +607,7 @@ export function LegalScreen() {
             </>
           ) : (
             <>
-              <h1 className="text-[28px] font-bold text-foreground">Privacy</h1>
+              <h1 className="text-[22px] font-bold text-foreground">Privacy</h1>
               <p>
                 We use the name, email, phone, and event details you submit to respond to your
                 inquiry and keep a record of the request on this device. This preview stores that

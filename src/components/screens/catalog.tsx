@@ -8,10 +8,10 @@ import {
   NavBar,
   ScreenContainer,
   SearchField,
-  Segmented,
 } from "../ios";
 import { serviceBySlug, services, talentBySlug, talents, type Service } from "../../lib/content";
 import { haptic } from "../../lib/haptics";
+import { cn } from "../../lib/utils";
 import { Sparkles } from "lucide-react";
 
 export function ServicesScreen() {
@@ -37,17 +37,36 @@ export function ServicesScreen() {
       <AppHeader title="Services" subtitle="Live music, specialty acts, and custom lineups.">
         <div className="space-y-3">
           <SearchField value={query} onChange={setQuery} placeholder="Search talent and services" />
-          <Segmented
-            ariaLabel="Service filter"
-            value={filter}
-            onChange={setFilter}
-            options={[
-              { id: "all", label: "All" },
-              { id: "live-music", label: "Music" },
-              { id: "specialty", label: "Specialty" },
-              { id: "custom", label: "Custom" },
-            ]}
-          />
+          <div className="flex gap-2" role="tablist" aria-label="Service filter">
+            {(
+              [
+                { id: "all", label: "All" },
+                { id: "live-music", label: "Music" },
+                { id: "specialty", label: "Specialty" },
+                { id: "custom", label: "Custom" },
+              ] as const
+            ).map((option) => {
+              const selected = filter === option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => {
+                    haptic("tap");
+                    setFilter(option.id);
+                  }}
+                  className={cn(
+                    "h-8 rounded-full px-3 text-[13px] font-semibold",
+                    selected ? "bg-white text-[#0001FF]" : "bg-white/15 text-white",
+                  )}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </AppHeader>
       {serviceCards.length === 0 && talentCards.length === 0 ? (
@@ -107,7 +126,7 @@ function ServiceCard({ service }: { service: Service }) {
         <img src={service.image} alt="" className="h-40 w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 p-4">
-          <h2 className="text-[22px] font-semibold text-white">{service.title}</h2>
+          <h2 className="text-[18px] font-semibold text-white">{service.title}</h2>
         </div>
       </div>
       <p className="px-4 py-3 text-[15px] leading-snug text-secondary-text">{service.blurb}</p>
@@ -137,14 +156,14 @@ export function ServiceDetail({ slug }: { slug: string }) {
       <div className="relative">
         <img src={service.image} alt="" className="h-64 w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/30" />
-        <h1 className="absolute inset-x-0 bottom-0 p-4 text-[28px] font-bold leading-tight text-white">
+        <h1 className="absolute inset-x-0 bottom-0 p-4 text-[22px] font-bold leading-tight text-white">
           {service.title}
         </h1>
       </div>
       <div className="space-y-5 px-4 py-5">
         <p className="text-[17px] leading-relaxed">{service.description}</p>
         <div>
-          <h2 className="text-[22px] font-semibold">What’s included</h2>
+          <h2 className="text-[18px] font-semibold">What’s included</h2>
           <ul className="mt-3 space-y-2">
             {service.includes.map((item) => (
               <li
@@ -158,7 +177,7 @@ export function ServiceDetail({ slug }: { slug: string }) {
         </div>
         {related.length ? (
           <div>
-            <h2 className="mb-3 text-[22px] font-semibold">Talent in this category</h2>
+            <h2 className="mb-3 text-[18px] font-semibold">Talent in this category</h2>
             <div className="space-y-2">
               {related.map((talent) => (
                 <Link
@@ -214,7 +233,7 @@ export function TalentDetail({ slug }: { slug: string }) {
           <p className="text-[13px] font-semibold uppercase tracking-wide text-white/80">
             {service?.title}
           </p>
-          <h1 className="text-[34px] font-bold leading-none text-white">{talent.title}</h1>
+          <h1 className="text-[26px] font-bold leading-none text-white">{talent.title}</h1>
         </div>
       </div>
       <div className="space-y-5 px-4 py-5">

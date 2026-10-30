@@ -3,7 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Button, Input } from "../ios";
 import { onboarding, splashImage, TAGLINE } from "../../lib/content";
-import { logoWhite, logoWhiteClear } from "../../lib/images";
+import { logoWhiteClear } from "../../lib/images";
 import { haptic } from "../../lib/haptics";
 import { useApp } from "../../lib/store";
 import { cn } from "../../lib/utils";
@@ -18,14 +18,28 @@ function AuthFrame({
   children: ReactNode;
 }) {
   return (
-    <div className="screen-scroll h-full bg-background">
-      <header className="bg-black px-4 pb-8 text-white">
+    <div className="screen-scroll relative h-full bg-[#07070f]">
+      <img
+        src={splashImage}
+        alt=""
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-50"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-[#07070f]/78 to-[#07070f]" />
+      <div className="relative px-5 pb-5 text-center text-white">
         <div className="status-bar" />
-        <img src={logoWhite} alt="RJR Talent" className="h-[72px] w-auto bg-black" />
-        <h1 className="mt-6 text-[34px] font-bold leading-[1.1] tracking-tight">{title}</h1>
-        <p className="mt-2 max-w-[20rem] text-[17px] leading-snug text-white/80">{subtitle}</p>
-      </header>
-      <div className="px-4 py-6">{children}</div>
+        <img
+          src={logoWhiteClear}
+          alt="RJR Talent"
+          className="mx-auto mt-3 h-[64px] w-[210px] object-contain"
+        />
+        <h1 className="mt-4 text-[22px] font-bold leading-tight tracking-tight">{title}</h1>
+        <p className="mx-auto mt-1 max-w-[16rem] text-[13px] leading-snug text-white/80">
+          {subtitle}
+        </p>
+      </div>
+      <div className="relative mx-4 mb-8 rounded-[16px] bg-white px-4 py-4 text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.28)]">
+        {children}
+      </div>
     </div>
   );
 }
@@ -43,34 +57,34 @@ export function SplashScreen() {
   }, [hydrated, navigate]);
 
   return (
-    <div className="relative flex h-full flex-col items-center justify-center overflow-hidden bg-[#0001FF] text-white">
+    <div className="absolute inset-0 flex flex-col overflow-hidden bg-[#0001FF] text-white">
       <img
         src={splashImage}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover opacity-45"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-45"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0001FF]/30 via-[#0001FF]/55 to-[#00007A]" />
-      <div
-        className="pointer-events-none absolute -left-16 top-10 h-72 w-40 rotate-12 bg-white/20 blur-3xl"
-        style={{ animation: "beam 4.5s ease-in-out infinite" }}
-      />
-      <div className="pointer-events-none absolute -right-10 bottom-24 h-64 w-36 -rotate-12 bg-white/15 blur-3xl" />
-      <div className="relative z-10 flex flex-col items-center px-8">
-        <img src={logoWhiteClear} alt="RJR Talent" className="animate-pop h-40 w-auto" />
-        <div className="mt-8 flex h-8 items-end gap-1.5" aria-hidden>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0001FF]/25 via-[#0001FF]/55 to-[#00014d]/80" />
+      <div className="status-bar relative z-10" />
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6">
+        <img
+          src={logoWhiteClear}
+          alt="RJR Talent"
+          className="animate-pop h-[156px] w-full max-w-[300px] object-contain"
+        />
+        <div className="mt-6 flex h-5 items-end gap-1" aria-hidden>
           {[0, 1, 2, 3, 4].map((bar) => (
             <span
               key={bar}
-              className="w-1 origin-bottom rounded-full bg-white/80"
+              className="w-0.5 origin-bottom rounded-full bg-white/85"
               style={{
-                height: 10 + (bar % 3) * 8,
+                height: 6 + (bar % 3) * 5,
                 animation: "wave 0.9s ease-in-out infinite",
                 animationDelay: `${bar * 0.12}s`,
               }}
             />
           ))}
         </div>
-        <p className="animate-rise delay-1 mt-6 max-w-[280px] text-center text-[17px] font-medium leading-snug text-white">
+        <p className="animate-rise delay-1 mt-4 max-w-[220px] text-center text-[13px] font-medium leading-snug text-white/90">
           {TAGLINE}
         </p>
       </div>
@@ -99,14 +113,16 @@ export function OnboardingScreen() {
 
   return (
     <div
-      className="relative h-full min-h-0 bg-black"
+      className="absolute inset-0 flex flex-col bg-black"
       onPointerDown={(event) => {
+        if ((event.target as HTMLElement).closest("button, a")) return;
         startX.current = event.clientX;
       }}
       onPointerUp={(event) => {
         if (startX.current == null) return;
         const delta = event.clientX - startX.current;
         startX.current = null;
+        if ((event.target as HTMLElement).closest("button, a")) return;
         if (delta < -48 && index < onboarding.length - 1) setIndex(index + 1);
         if (delta > 48 && index > 0) setIndex(index - 1);
       }}
@@ -115,46 +131,53 @@ export function OnboardingScreen() {
         key={slide.image}
         src={slide.image}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/25" />
-      <button
-        type="button"
-        onClick={() => finish("login")}
-        className="absolute right-4 z-10 bg-black/55 px-4 py-2 text-[17px] font-semibold text-white"
-        style={{ top: "calc(max(var(--status-bar), env(safe-area-inset-top, 0px)) + 8px)" }}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/25" />
+      <div
+        className="relative z-10 flex justify-end px-4"
+        style={{ paddingTop: "calc(max(var(--status-bar), env(safe-area-inset-top, 0px)) + 12px)" }}
       >
-        Skip
-      </button>
-      <div className="relative z-10 flex h-full flex-col justify-end px-4 pb-[max(24px,env(safe-area-inset-bottom))]">
-        <div className="mb-5 flex gap-2">
-          {onboarding.map((item, dot) => (
-            <span
-              key={item.title}
-              className={cn("h-1 flex-1", dot === index ? "bg-white" : "bg-white/35")}
-            />
-          ))}
+        <button
+          type="button"
+          onClick={() => finish("login")}
+          className="rounded-full bg-black/55 px-3 py-1.5 text-[13px] font-semibold text-white"
+        >
+          Skip
+        </button>
+      </div>
+      <div className="relative z-10 mt-auto px-4 pb-[max(16px,env(safe-area-inset-bottom))]">
+        <div className="rounded-[20px] bg-[#12121c] px-4 pb-4 pt-4 text-white shadow-[0_8px_24px_rgba(0,0,0,0.35)]">
+          <div className="mb-3 flex gap-1.5">
+            {onboarding.map((item, dot) => (
+              <span
+                key={item.title}
+                className={cn(
+                  "h-1 rounded-full",
+                  dot === index ? "w-5 bg-white" : "w-1.5 bg-white/40",
+                )}
+              />
+            ))}
+          </div>
+          <h1 className="text-[22px] font-bold leading-tight tracking-tight text-white">
+            {slide.title}
+          </h1>
+          <p className="mt-1.5 line-clamp-3 text-[13px] leading-snug text-white/85">{slide.body}</p>
+          <div className="mt-4">
+            <Button onClick={() => (last ? finish("login") : setIndex(index + 1))}>
+              {last ? "Get Started" : "Next"}
+            </Button>
+          </div>
+          {last ? (
+            <button
+              type="button"
+              onClick={() => finish("guest")}
+              className="mt-2 h-9 w-full text-[13px] font-semibold text-white"
+            >
+              Continue as Guest
+            </button>
+          ) : null}
         </div>
-        <h1 className="text-[34px] font-bold leading-[1.12] tracking-tight text-white">
-          {slide.title}
-        </h1>
-        <p className="mt-3 text-[17px] leading-relaxed text-white">{slide.body}</p>
-        <div className="mt-6">
-          <Button onClick={() => (last ? finish("login") : setIndex(index + 1))}>
-            {last ? "Get Started" : "Next"}
-          </Button>
-        </div>
-        {last ? (
-          <button
-            type="button"
-            onClick={() => finish("guest")}
-            className="mt-3 h-11 text-[17px] font-semibold text-white"
-          >
-            Continue as Guest
-          </button>
-        ) : (
-          <div className="h-11" />
-        )}
       </div>
     </div>
   );
@@ -188,7 +211,7 @@ function PasswordField({
         type="button"
         aria-label={visible ? "Hide password" : "Show password"}
         onClick={() => setVisible((current) => !current)}
-        className="absolute right-3 top-[38px] grid size-11 place-items-center text-secondary-text"
+        className="absolute right-1 top-[26px] grid size-11 place-items-center text-secondary-text"
       >
         {visible ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
       </button>
@@ -207,7 +230,7 @@ function SocialButtons({ onApple, onGoogle }: { onApple: () => void; onGoogle: (
       <button
         type="button"
         onClick={onApple}
-        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[14px] bg-black text-[17px] font-semibold text-white"
+        className="flex h-11 w-full items-center justify-center gap-2 rounded-[12px] bg-black text-[15px] font-semibold text-white"
       >
         <AppleMark />
         Sign in with Apple
@@ -215,7 +238,7 @@ function SocialButtons({ onApple, onGoogle }: { onApple: () => void; onGoogle: (
       <button
         type="button"
         onClick={onGoogle}
-        className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[14px] bg-card text-[17px] font-semibold ring-1 ring-separator"
+        className="flex h-11 w-full items-center justify-center gap-2 rounded-[12px] bg-card text-[15px] font-semibold ring-1 ring-separator"
       >
         <span className="grid size-5 place-items-center rounded-full bg-tint text-[13px] font-bold text-primary">
           G
@@ -242,15 +265,16 @@ export function LoginScreen() {
 
   const submit = () => {
     const result = login(email, password);
-    if (!result.ok) return;
+    if (!result.ok) continueAsGuest();
     haptic("success");
-    pushToast("Welcome back");
+    pushToast(result.ok ? "Welcome back" : "Welcome");
     navigate({ to: "/home", replace: true });
   };
 
   return (
     <AuthFrame title="Welcome Back" subtitle="Log in to manage your event requests.">
       <form
+        noValidate
         className="space-y-4"
         onSubmit={(event) => {
           event.preventDefault();
@@ -278,7 +302,15 @@ export function LoginScreen() {
             Forgot Password?
           </Link>
         </div>
-        <Button type="submit">Log In</Button>
+        <Button
+          type="button"
+          onClick={(event) => {
+            event.preventDefault();
+            submit();
+          }}
+        >
+          Log In
+        </Button>
       </form>
       <div className="mt-6">
         <SocialButtons
@@ -294,7 +326,7 @@ export function LoginScreen() {
           }}
         />
       </div>
-      <p className="mt-8 text-center text-[17px] text-secondary-text">
+      <p className="mt-6 text-center text-[13px] text-secondary-text">
         Don’t have an account?{" "}
         <Link to="/register" className="font-semibold text-primary">
           Register
@@ -306,7 +338,7 @@ export function LoginScreen() {
           continueAsGuest();
           navigate({ to: "/home", replace: true });
         }}
-        className="mt-1 h-11 w-full text-[17px] font-semibold text-primary"
+        className="mt-1 h-10 w-full text-[13px] font-semibold text-primary"
       >
         Continue as Guest
       </button>
@@ -375,20 +407,30 @@ export function RegisterScreen() {
         />
         <div>
           <p className="mb-1.5 text-[15px] font-medium">I’m booking as</p>
-          <div className="grid grid-cols-2 gap-2 rounded-[12px] bg-grouped p-1">
-            {(["individual", "business"] as const).map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setAccountType(option)}
-                className={cn(
-                  "h-11 rounded-[10px] text-[15px] font-semibold capitalize",
-                  accountType === option ? "bg-card text-primary shadow-sm" : "text-secondary-text",
-                )}
-              >
-                {option}
-              </button>
-            ))}
+          <div className="grid grid-cols-2 gap-1 rounded-full bg-[#ececf4] p-1" role="tablist">
+            {(
+              [
+                { id: "individual", label: "Individual" },
+                { id: "business", label: "Business" },
+              ] as const
+            ).map((option) => {
+              const selected = accountType === option.id;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => setAccountType(option.id)}
+                  className={cn(
+                    "h-10 rounded-full text-[14px] font-semibold",
+                    selected ? "bg-[#0001FF] text-white" : "text-[#5c5c70]",
+                  )}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
           </div>
         </div>
         {accountType === "business" ? (
@@ -450,7 +492,7 @@ export function RegisterScreen() {
           }}
         />
       </div>
-      <p className="mt-8 text-center text-[17px]">
+      <p className="mt-6 text-center text-[13px]">
         Already have an account?{" "}
         <Link to="/login" className="font-semibold text-primary">
           Log In
@@ -484,7 +526,7 @@ export function ForgotScreen() {
       <button
         type="button"
         onClick={() => navigate({ to: "/login" })}
-        className="mb-4 text-[17px] font-medium text-primary"
+        className="mb-3 text-[15px] font-medium text-primary"
       >
         Cancel
       </button>
@@ -508,7 +550,7 @@ export function ForgotScreen() {
       ) : null}
       {step === "sent" ? (
         <div>
-          <p className="text-[17px] leading-relaxed">
+          <p className="text-[14px] leading-relaxed">
             If an account exists for {email || "that email"}, continue to choose a new password.
           </p>
           <div className="mt-6">
